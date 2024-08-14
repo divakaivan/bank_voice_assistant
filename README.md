@@ -3,7 +3,7 @@
 * Used Dataset - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
 * Database - SQLite
 * LLM - OpenAI's GPT
-* Audio Model - openai/whisper-small from [HuggingFace](https://huggingface.co/openai/whisper-small)
+* Audio Transcription Model - openai/whisper-small from [HuggingFace](https://huggingface.co/openai/whisper-small)
 * RAG pipeline - [LlamaIndex](https://docs.llamaindex.ai/en/stable/module_guides/querying/pipeline/)
 * Monitoring/Tracing - [Azire Pheonix](https://github.com/Arize-ai/phoenix)
 * User Interface - Streamlit
@@ -22,7 +22,7 @@
 
 # User Interface
 
-* communicate through text or audio
+* communicate through text or speech
 * ask follow-up questions (the language model can see the chat history)
 
 ![st-ui](project-info/st_ex.png)
@@ -80,7 +80,7 @@ Otherwise:
 
 # Future improvements
 
-* improve audio input/output
-  * audio input uses a 3rd party component as there is no official audio input API by streamlit
+* improve speech input/output
+  * speech input uses a 3rd party component as there is no official audio input API by streamlit
 * evaluate SQL queries
 * at the moment there is a prompt validation step using gpt-4o-mini, but there could be a better way
