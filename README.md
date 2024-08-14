@@ -27,7 +27,7 @@
 
 ![st-ui](project-info/st_ex.png)
 
-# Tracing 
+# Monitoring 
 
 * on the dev side, see how the RAG is performing by analysing prompts and retrieved information
 
@@ -76,7 +76,7 @@ If running for the first time, run the setup:
 * `make data`
 
 Otherwise:
-* `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`. Also RAG tracing on `http://127.0.0.1:6006`
+* `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`. Also RAG monitoring on `http://127.0.0.1:6006`
 
 # Future improvements
 
