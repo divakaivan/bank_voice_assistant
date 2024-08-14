@@ -1,6 +1,6 @@
 # :speech_balloon: Chat, Talk, Learn and Analyse your spending habits with your Personal Finance Assistant
 
-* Dataset source - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
+* Preloaded Dataset - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
 * Database - SQLite
 * LLM - OpenAI's GPT
 * Audio Model - openai/whisper-small from [HuggingFace](https://huggingface.co/openai/whisper-small)
