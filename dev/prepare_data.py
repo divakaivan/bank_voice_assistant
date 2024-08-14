@@ -7,12 +7,11 @@ from typing import Dict
 import pandas as pd
 from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, text
 
-from llama_index import SQLDatabase, VectorStoreIndex, load_index_from_storage
+from llama_index import SQLDatabase, VectorStoreIndex
 from llama_index.bridge.pydantic import BaseModel, Field
 from llama_index.query_pipeline import QueryPipeline as QP
 from llama_index.schema import TextNode
 from llama_index.service_context import ServiceContext
-from llama_index.storage import StorageContext
 from llama_index.llms import OpenAI
 from llama_index.program import LLMTextCompletionProgram
 
