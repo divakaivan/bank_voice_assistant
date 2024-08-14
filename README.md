@@ -53,9 +53,9 @@ Options:
   del-audio            Delete any generated audio files
 ```
 If running for the first time, run the setup:
-1. `make install`
-2. `make data`
+* `make install`
+* `make data`
 
-Application:
-1. `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`
+Otherwise:
+* `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`
 
