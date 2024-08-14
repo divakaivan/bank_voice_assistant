@@ -9,6 +9,10 @@ help:  ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
+.PHONY: setup
+install:  ## Install dependencies
+	pip install -r requirements.txt
+
 .PHONY: data
 data:  ## Prepare data for the app (will overwrite any existing data)
 	cd dev && python prepare_data.py && cd .. && python dev/move_files_to_app.py
