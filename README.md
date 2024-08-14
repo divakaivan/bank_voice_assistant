@@ -1,6 +1,6 @@
 # :speech_balloon: Chat, Talk, Learn and Analyse your spending habits with your Personal Finance Assistant
 
-* Preloaded Dataset - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
+* Used Dataset - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
 * Database - SQLite
 * LLM - OpenAI's GPT
 * Audio Model - openai/whisper-small from [HuggingFace](https://huggingface.co/openai/whisper-small)
@@ -11,6 +11,14 @@
 # Demo
 
 [demo-vid](https://github.com/user-attachments/assets/142edc42-1c36-4e58-9b46-851876f077f3)
+
+# Preprocessed Data sample
+
+| Name | Surname | Gender | Transaction Amount |    Date    |         Merchant Name          |   Category   |
+|------|---------|--------|--------------------|------------|--------------------------------|--------------|
+| Ivan | Ivanov  | M      |              35.47 | 03-04-2023 | Smith-Russell                  | Cosmetic     |
+| Ivan | Ivanov  | M      |            2552.72 | 17-07-2023 | Peck, Spence and Young         | Travel       |
+| Ivan | Ivanov  | M      |             115.97 | 20-09-2023 | Steele Inc                     | Clothing     |
 
 # User Interface
 
