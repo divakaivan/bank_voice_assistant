@@ -1,13 +1,5 @@
 # :speech_balloon: Chat, Talk, Learn and Analyse your spending habits with your Personal Finance Assistant
 
-# Demo
-
-TBD
-
-# :bar_chart: Project diagram 
-
-![rag-dag](project-info/rag_dag.png)
-
 * Dataset source - [Kaggle](https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset)
 * Database - SQLite
 * LLM - OpenAI's GPT
@@ -15,6 +7,10 @@ TBD
 * RAG pipeline - [LlamaIndex](https://docs.llamaindex.ai/en/stable/module_guides/querying/pipeline/)
 * Monitoring/Tracing - [Azire Pheonix](https://github.com/Arize-ai/phoenix)
 * User Interface - Streamlit
+
+# Demo
+
+TBD
 
 # User Interface
 
@@ -28,6 +24,10 @@ TBD
 * on the dev side, see how the RAG is performing by analysing prompts and retrieved information
 
 ![tracing-ui](project-info/tracing_ex.png)
+
+# :bar_chart: Project diagram 
+
+![rag-dag](project-info/rag_dag.png)
 
 # :evergreen_tree: Repository Structure 
 
