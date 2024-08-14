@@ -1,3 +1,4 @@
+
 import os
 import re
 from typing import Dict, List
@@ -21,6 +22,7 @@ from llama_index.retrievers import SQLRetriever
 from llama_index.service_context import ServiceContext
 from llama_index.storage import StorageContext
 from sqlalchemy import create_engine
+from streamlit_mic_recorder import mic_recorder
 from transformers import pipeline
 
 load_dotenv()
@@ -224,7 +226,10 @@ if "chat_history" not in st.session_state:
         {"role": "AI", "content": "Hello! Ask me anything about your transaction history"},
     ]
 
-def render_message(message):
+def render_message(message: Dict[str, str]) -> None:
+    """
+    Render audio chat message
+    """
     role = "assistant" if message["role"] == "AI" else "user"
     with st.chat_message(role):
         st.markdown(message["content"], unsafe_allow_html=True)
@@ -240,8 +245,22 @@ for message in st.session_state.chat_history:
 
 pipe = pipeline(model="openai/whisper-small")
 
-from streamlit_mic_recorder import mic_recorder
+def check_valid_prompt(user_text_query: str) -> str:
+    """
+    Check if the user query is valid and related to finance transactions.
+    """
+    check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_text_query}"
+    gpt4omini = gpt_client()
+    response = gpt4omini.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": check_prompt}]
+    )
+    llm_check_response = response.choices[0].message.content
+    return llm_check_response
 
+INVALID_MSG_STR = "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."
+
+############### Audio input ###############
 user_audio_query = mic_recorder(start_prompt="Record audio ⏺️", stop_prompt="Stop audio ⏹️", key="recorder")
 if user_audio_query is not None:
     with st.spinner("Processing your query..."):
@@ -250,13 +269,7 @@ if user_audio_query is not None:
     st.session_state.chat_history.append({"role": "Human", "content": user_query})
     render_message({"role": "Human", "content": user_query})
     if user_query and user_query.strip():
-        check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_query}"
-        gpt4omini = gpt_client()
-        response = gpt4omini.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": check_prompt}]
-        )
-        llm_check_response = response.choices[0].message.content
+        llm_check_response = check_valid_prompt(user_query)
         if 'yes' in llm_check_response.lower():
             with st.spinner("Looking for answers..."):
                 response = run_with_chat_history(user_query, st.session_state.chat_history)
@@ -265,24 +278,16 @@ if user_audio_query is not None:
             st.session_state.chat_history.append({"role": "AI", "content": response_content})
             render_message({"role": "AI", "content": response_content})
         else:
-            st.session_state.chat_history.append({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
-            render_message({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
+            st.session_state.chat_history.append({"role": "AI", "content": INVALID_MSG_STR})
+            render_message({"role": "AI", "content": INVALID_MSG_STR})
 
-# Text input as fallback
+############### Text input ###############
 user_text_query = st.chat_input("Or type your question here:")
 if user_text_query:
-
     st.session_state.chat_history.append({"role": "Human", "content": user_text_query})
     render_message({"role": "Human", "content": user_text_query})
 
-    with st.spinner("Looking..."):
-        check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_text_query}"
-        gpt4omini = gpt_client()
-        response = gpt4omini.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": check_prompt}]
-        )
-        llm_check_response = response.choices[0].message.content
+    llm_check_response = check_valid_prompt(user_text_query)
     if "yes" in llm_check_response.lower():
         with st.spinner("Looking for answers..."):
             response = run_with_chat_history(user_text_query, st.session_state.chat_history)
@@ -291,5 +296,5 @@ if user_text_query:
         st.session_state.chat_history.append({"role": "AI", "content": response_content})
         render_message({"role": "AI", "content": response_content})
     else:
-        st.session_state.chat_history.append({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
-        render_message({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
+        st.session_state.chat_history.append({"role": "AI", "content": INVALID_MSG_STR})
+        render_message({"role": "AI", "content": INVALID_MSG_STR})
