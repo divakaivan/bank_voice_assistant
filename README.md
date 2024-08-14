@@ -10,7 +10,7 @@
 
 # Demo
 
-[demo-video](https://github.com/user-attachments/assets/f69df41c-ba71-4bbd-9640-ad3230bc433d)
+
 
 # User Interface
 
