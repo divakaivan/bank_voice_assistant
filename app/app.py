@@ -5,12 +5,13 @@ from typing import Dict, List
 import llama_index
 import phoenix as px
 import streamlit as st
+from dotenv import load_dotenv
 from gtts import gTTS
 from llama_index import SQLDatabase, VectorStoreIndex, load_index_from_storage
 from llama_index.bridge.pydantic import BaseModel, Field
 from llama_index.llms import ChatResponse, OpenAI
-from llama_index.objects import (ObjectIndex, SQLTableNodeMapping, SQLTableSchema)
-
+from llama_index.objects import (ObjectIndex, SQLTableNodeMapping,
+                                 SQLTableSchema)
 from llama_index.prompts import PromptTemplate
 from llama_index.prompts.default_prompts import DEFAULT_TEXT_TO_SQL_PROMPT
 from llama_index.query_pipeline import FnComponent, InputComponent
@@ -21,6 +22,8 @@ from llama_index.storage import StorageContext
 from sqlalchemy import create_engine
 from st_audiorec import st_audiorec
 from transformers import pipeline
+
+load_dotenv()
 
 # px.launch_app()
 # llama_index.set_global_handler("arize_phoenix")
