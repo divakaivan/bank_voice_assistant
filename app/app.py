@@ -2,6 +2,7 @@ import os
 import re
 from typing import Dict, List
 
+from openai import OpenAI as gpt_client
 import llama_index
 import phoenix as px
 import streamlit as st
@@ -20,7 +21,6 @@ from llama_index.retrievers import SQLRetriever
 from llama_index.service_context import ServiceContext
 from llama_index.storage import StorageContext
 from sqlalchemy import create_engine
-from st_audiorec import st_audiorec
 from transformers import pipeline
 
 load_dotenv()
@@ -28,12 +28,12 @@ load_dotenv()
 # px.launch_app()
 # llama_index.set_global_handler("arize_phoenix")
 # below helps to avoid launching tracing on every refresh
-if 'app_launched' not in st.session_state:
-    st.session_state['app_launched'] = False
-if not st.session_state['app_launched']:
+if "app_launched" not in st.session_state:
+    st.session_state["app_launched"] = False
+if not st.session_state["app_launched"]:
     px.launch_app()
     llama_index.set_global_handler("arize_phoenix")
-    st.session_state['app_launched'] = True
+    st.session_state["app_launched"] = True
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
@@ -60,7 +60,7 @@ class TableInfo(BaseModel):
     table_name: str = Field(..., description="table name (must be underscores and NO spaces)")
     table_summary: str = Field(..., description="short, concise summary/caption of the table")
 
-table_info = TableInfo.parse_file('app/table_info_directory/0_Ivanov_Transactions.json')
+table_info = TableInfo.parse_file("app/table_info_directory/0_Ivanov_Transactions.json")
 
 table_node_mapping = SQLTableNodeMapping(sql_database)
 table_schema_objs = [SQLTableSchema(table_name=table_info.table_name, context_str=table_info.table_summary)]
@@ -157,8 +157,8 @@ def run_with_chat_history(query: str, chat_history: List[Dict[str, str]]):
     insert_text = "Today's Day is 14th October 2023 - keep that in mind if the user asks date related questions.\n\nTake into account the conversation history: {chat_history}\n\n"
     text2sql_prompt.template = re.sub(pattern, insert_text + r"\1", text2sql_prompt.template)
     # remove latest q from chat history
-    pattern = r'(.*)(User:.*?)(\n\s*\n)'
-    text2sql_prompt.template = re.sub(pattern, r'\1', text2sql_prompt.template, count=1, flags=re.DOTALL).strip()
+    pattern = r"(.*)(User:.*?)(\n\s*\n)"
+    text2sql_prompt.template = re.sub(pattern, r"\1", text2sql_prompt.template, count=1, flags=re.DOTALL).strip()
 
     text2sql_prompt = text2sql_prompt.partial_format(chat_history=format_chat_history(chat_history))
 
@@ -219,50 +219,77 @@ with st.sidebar:
     3. Read/Listen to the AI responses.
     """)
 
-if 'chat_history' not in st.session_state:
+if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "AI", "content": 'Hello! Ask me anything about your transaction history'},
+        {"role": "AI", "content": "Hello! Ask me anything about your transaction history"},
     ]
 
 def render_message(message):
     role = "assistant" if message["role"] == "AI" else "user"
     with st.chat_message(role):
         st.markdown(message["content"], unsafe_allow_html=True)
-        msg_tts = gTTS(message["content"], lang="en")
-        audio_file = f"{role}_msg.mp3"
-        msg_tts.save(audio_file)
-        st.audio(audio_file)
+        # prevent audio for non-text messages
+        if re.search("[a-zA-Z]", message["content"]):
+            msg_tts = gTTS(message["content"], lang="en")
+            audio_file = f"{role}_msg.mp3"
+            msg_tts.save(audio_file)
+            st.audio(audio_file)
 
 for message in st.session_state.chat_history:
     render_message(message)
 
 pipe = pipeline(model="openai/whisper-small")
 
-user_audio_query = st_audiorec()
-if user_audio_query:
+from streamlit_mic_recorder import mic_recorder
+
+user_audio_query = mic_recorder(start_prompt="Record audio ⏺️", stop_prompt="Stop audio ⏹️", key="recorder")
+if user_audio_query is not None:
     with st.spinner("Processing your query..."):
-        user_query = pipe(user_audio_query)["text"]
+        user_query = pipe(user_audio_query["bytes"])["text"]
 
+    st.session_state.chat_history.append({"role": "Human", "content": user_query})
+    render_message({"role": "Human", "content": user_query})
     if user_query and user_query.strip():
-        st.session_state.chat_history.append({"role": "Human", "content": user_query})
-        render_message({"role": "Human", "content": user_query})
+        check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_query}"
+        gpt4omini = gpt_client()
+        response = gpt4omini.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": check_prompt}]
+        )
+        llm_check_response = response.choices[0].message.content
+        if 'yes' in llm_check_response.lower():
+            with st.spinner("Looking for answers..."):
+                response = run_with_chat_history(user_query, st.session_state.chat_history)
+                response_content = response.message.content if isinstance(response, ChatResponse) else str(response)
 
-        with st.spinner("Looking for answers..."):
-            response = run_with_chat_history(user_query, st.session_state.chat_history)
-            response_content = response.message.content if isinstance(response, ChatResponse) else str(response)
-
-        st.session_state.chat_history.append({"role": "AI", "content": response_content})
-        render_message({"role": "AI", "content": response_content})
+            st.session_state.chat_history.append({"role": "AI", "content": response_content})
+            render_message({"role": "AI", "content": response_content})
+        else:
+            st.session_state.chat_history.append({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
+            render_message({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
 
 # Text input as fallback
 user_text_query = st.chat_input("Or type your question here:")
 if user_text_query:
+
     st.session_state.chat_history.append({"role": "Human", "content": user_text_query})
     render_message({"role": "Human", "content": user_text_query})
 
-    with st.spinner("Looking for answers..."):
-        response = run_with_chat_history(user_text_query, st.session_state.chat_history)
-        response_content = response.message.content if isinstance(response, ChatResponse) else str(response)
+    with st.spinner("Looking..."):
+        check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_text_query}"
+        gpt4omini = gpt_client()
+        response = gpt4omini.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": check_prompt}]
+        )
+        llm_check_response = response.choices[0].message.content
+    if "yes" in llm_check_response.lower():
+        with st.spinner("Looking for answers..."):
+            response = run_with_chat_history(user_text_query, st.session_state.chat_history)
+            response_content = response.message.content if isinstance(response, ChatResponse) else str(response)
 
-    st.session_state.chat_history.append({"role": "AI", "content": response_content})
-    render_message({"role": "AI", "content": response_content})
+        st.session_state.chat_history.append({"role": "AI", "content": response_content})
+        render_message({"role": "AI", "content": response_content})
+    else:
+        st.session_state.chat_history.append({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
+        render_message({"role": "AI", "content": "Hi, I am your Personal Finance Assistant. Please ask me questions related to your transactions."})
