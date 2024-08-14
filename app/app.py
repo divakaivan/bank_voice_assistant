@@ -22,7 +22,6 @@ from sqlalchemy import create_engine
 from st_audiorec import st_audiorec
 from transformers import pipeline
 
-# https://www.kaggle.com/datasets/rajatsurana979/comprehensive-credit-card-transactions-dataset
 # px.launch_app()
 # llama_index.set_global_handler("arize_phoenix")
 # below helps to avoid launching tracing on every refresh
@@ -214,7 +213,7 @@ with st.sidebar:
     st.markdown("""
     1. Ask anything about your transaction history.
     2. You can speak or type your queries.
-    3. Listen to the AI responses.
+    3. Read/Listen to the AI responses.
     """)
 
 if 'chat_history' not in st.session_state:
