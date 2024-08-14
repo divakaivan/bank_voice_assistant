@@ -84,3 +84,4 @@ Otherwise:
   * speech input uses a 3rd party component as there is no official audio input API by streamlit
 * evaluate SQL queries
 * at the moment there is a prompt validation step using gpt-4o-mini, but there could be a better way
+* Use a free LLM (although the total cost for using OpenAI api was only $0.24 during development)
