@@ -17,7 +17,7 @@ TBD
 * User Interface - Streamlit
 
 
-# :evergreen_tree: Folder Tree 
+# :evergreen_tree: Repository Structure 
 
 ```
 ├── app/
