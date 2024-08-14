@@ -52,8 +52,7 @@ Options:
   start                Start app
   del-audio            Delete any generated audio files
 ```
-If running for the first time, run:
-Setup:
+If running for the first time, run the setup:
 1. `make install`
 2. `make data`
 
