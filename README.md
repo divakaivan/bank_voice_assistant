@@ -1,6 +1,4 @@
-# Your Finance Assistant
-
-## :speech_balloon: Chat, Talk, Learn and Analyse your spending habits with your Personal Finance assistant
+# :speech_balloon: Chat, Talk, Learn and Analyse your spending habits with your Personal Finance Assistant
 
 # Demo
 
