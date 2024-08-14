@@ -245,11 +245,11 @@ for message in st.session_state.chat_history:
 
 pipe = pipeline(model="openai/whisper-small")
 
-def check_valid_prompt(user_text_query: str) -> str:
+def check_valid_prompt(user_text_query: str, chat_history: List[Dict[str, str]]) -> str:
     """
     Check if the user query is valid and related to finance transactions.
     """
-    check_prompt = f"Does the below user query look correct and related to finance transactions? Answer with 'Yes' or 'No':\n\n{user_text_query}"
+    check_prompt = f"You are a personal finance assistant. Here is the conversation history so far: {chat_history}\n\nDoes the below user query look correct and related to finance transactions and the chat history? Answer with 'Yes' or 'No':\n\n{user_text_query}"
     gpt4omini = gpt_client()
     response = gpt4omini.chat.completions.create(
         model="gpt-4o-mini",
@@ -269,7 +269,7 @@ if user_audio_query is not None:
     st.session_state.chat_history.append({"role": "Human", "content": user_query})
     render_message({"role": "Human", "content": user_query})
     if user_query and user_query.strip():
-        llm_check_response = check_valid_prompt(user_query)
+        llm_check_response = check_valid_prompt(user_query, st.session_state.chat_history)
         if 'yes' in llm_check_response.lower():
             with st.spinner("Looking for answers..."):
                 response = run_with_chat_history(user_query, st.session_state.chat_history)
@@ -287,7 +287,7 @@ if user_text_query:
     st.session_state.chat_history.append({"role": "Human", "content": user_text_query})
     render_message({"role": "Human", "content": user_text_query})
 
-    llm_check_response = check_valid_prompt(user_text_query)
+    llm_check_response = check_valid_prompt(user_text_query, st.session_state.chat_history)
     if "yes" in llm_check_response.lower():
         with st.spinner("Looking for answers..."):
             response = run_with_chat_history(user_text_query, st.session_state.chat_history)
