@@ -16,6 +16,18 @@ TBD
 * Monitoring/Tracing - [Azire Pheonix](https://github.com/Arize-ai/phoenix)
 * User Interface - Streamlit
 
+# User Interface
+
+* communicate through text or audio
+* ask follow-up questions (the language model can see the chat history)
+
+![st-ui](project-info/st_ex.png)
+
+# Tracing 
+
+* on the dev side, see how the RAG is performing by analysing prompts and retrieved information
+
+![tracing-ui](project-info/tracing_ex.png)
 
 # :evergreen_tree: Repository Structure 
 
@@ -39,7 +51,8 @@ TBD
 # Reproduction
 
 1. Clone the repo `git clone https://github.com/divakaivan/finance_voice_assistant.git` 
-2. Run `make` in the terminal, and you should see:
+2. Add your OPENAI_API_KEY to .env
+3. Run `make` in the terminal, and you should see:
 ```
 Usage: make [option]
 
@@ -55,5 +68,11 @@ If running for the first time, run the setup:
 * `make data`
 
 Otherwise:
-* `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`
+* `make start` - this will open the streamlit UI in your browser on `http://localhost:8501`. Also RAG tracing on `http://127.0.0.1:6006`
 
+# Future improvements
+
+* improve audio input/output
+  * audio input uses a 3rd party component as there is no official audio input API by streamlit
+* evaluate SQL queries
+* at the moment there is a prompt validation step using gpt-4o-mini, but there could be a better way
